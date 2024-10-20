@@ -1,1 +1,1 @@
-# Artify
+# Artify (generates an image according to the given art style)
