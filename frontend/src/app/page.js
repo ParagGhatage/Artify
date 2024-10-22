@@ -1,101 +1,298 @@
-import Image from "next/image";
+"use client";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-export default function Home() {
+const ImageUploader = () => {
+  const [selectedContentImage, setSelectedContentImage] = useState(null);
+  const [selectedStyleImage, setSelectedStyleImage] = useState(null);
+  const [outputImages, setOutputImages] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [contentFile, setContentFile] = useState(null);
+  const [styleFile, setStyleFile] = useState(null);
+  const [iterations, setIterations] = useState(100);
+  const [timer, setTimer] = useState(120);
+  const [intervalId, setIntervalId] = useState(null);
+
+  // Sample images for content and style
+  const sampleContentImages = [
+    "/samples/content1.jpg",
+    "/samples/content2.jpg",
+    "/samples/content3.jpg",
+  ];
+  const sampleStyleImages = [
+    "/samples/style1.jpg",
+    "/samples/style2.jpg",
+    "/samples/style3.jpg",
+  ];
+
+  const [useSampleContent, setUseSampleContent] = useState(false);
+  const [useSampleStyle, setUseSampleStyle] = useState(false);
+
+  const handleContentImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setContentFile(file);
+      setSelectedContentImage(URL.createObjectURL(file));
+    }
+  };
+
+  const handleStyleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setStyleFile(file);
+      setSelectedStyleImage(URL.createObjectURL(file));
+    }
+  };
+
+  const handleIterationsChange = (e) => {
+    setIterations(e.target.value);
+  };
+
+  const startTimer = () => {
+    setTimer(120); // Reset the timer to 120 seconds
+    const id = setInterval(() => {
+      setTimer((prevTimer) => {
+        if (prevTimer > 0) return prevTimer - 1;
+        stopTimer(); // Stop the timer when it reaches 0
+        return 0;
+      });
+    }, 1000);
+    setIntervalId(id);
+  };
+
+  const stopTimer = () => {
+    if (intervalId) {
+      clearInterval(intervalId);
+      setIntervalId(null); // Reset the interval ID after clearing it
+    }
+  };
+
+  useEffect(() => {
+    if (timer === 0) {
+      stopTimer();
+      setIsUploading(false);
+    }
+  }, [timer]);
+
+  const uploadImages = async () => {
+    // Clear any existing timer before starting a new upload
+    stopTimer();
+
+    setIsUploading(true);
+    startTimer();
+
+    const formData = new FormData();
+    // Include selected content image or uploaded file
+    if (contentFile) {
+      formData.append("content", contentFile);
+    } else if (selectedContentImage) {
+      const response = await fetch(selectedContentImage);
+      const blob = await response.blob();
+      formData.append("content", blob, "content_image.jpg");
+    } else {
+      alert("Please select a content image.");
+      setIsUploading(false);
+      stopTimer();
+      return;
+    }
+
+    // Include selected style image or uploaded file
+    if (styleFile) {
+      formData.append("style", styleFile);
+    } else if (selectedStyleImage) {
+      const response = await fetch(selectedStyleImage);
+      const blob = await response.blob();
+      formData.append("style", blob, "style_image.jpg");
+    } else {
+      alert("Please select a style image.");
+      setIsUploading(false);
+      stopTimer();
+      return;
+    }
+
+    formData.append("iterations", iterations);
+
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/style", formData, { responseType: "blob" });
+      const imageUrls = URL.createObjectURL(new Blob([response.data], { type: "image/png" }));
+      setOutputImages(imageUrls);
+    } catch (error) {
+      console.error("Error fetching image:", error);
+    } finally {
+      stopTimer(); // Ensure the timer is stopped once the upload completes
+      setIsUploading(false);
+    }
+  };
+
+  const downloadImage = () => {
+    if (outputImages) {
+      const link = document.createElement("a");
+      link.href = outputImages;
+      link.download = "processed_image.png";
+      link.click();
+    }
+  };
+
+  const selectSampleContentImage = (sample) => {
+    setSelectedContentImage(sample);
+    setContentFile(null); // Clear any uploaded file
+    setUseSampleContent(false); // Hide sample images after selection
+  };
+
+  const selectSampleStyleImage = (sample) => {
+    setSelectedStyleImage(sample);
+    setStyleFile(null); // Clear any uploaded file
+    setUseSampleStyle(false); // Hide sample images after selection
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-blue-500 p-6">
+      <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-2xl">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4">
+            Upload or Select Your Images
+          </h1>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        {/* Toggle to use sample content image */}
+        <div className="mb-4">
+          <label className="block mb-2 text-center text-amber-300">
+            <input
+              type="checkbox"
+              checked={useSampleContent}
+              onChange={() => setUseSampleContent(!useSampleContent)}
+            />
+            Use sample content image
+          </label>
+        </div>
+
+        {/* Content Image Input */}
+        {useSampleContent ? (
+          <div className="flex justify-center gap-4 mb-4">
+            {sampleContentImages.map((sample, index) => (
+              <img
+                key={index}
+                src={sample}
+                alt={`Sample Content ${index + 1}`}
+                className={`w-24 h-24 cursor-pointer rounded-lg ${selectedContentImage === sample ? "border-4 border-blue-500" : "border-2"}`}
+                onClick={() => selectSampleContentImage(sample)}
+              />
+            ))}
+          </div>
+        ) : (
+          <label className="block cursor-pointer mb-4">
+            <span className="text-gray-800 sm:text-lg font-semibold mb-2 block text-center">
+              Select Content Image:
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleContentImageChange}
+              className="hidden"
+            />
+            <div className="w-48 h-48 bg-gray-100 border-4 border-dashed border-gray-300 flex items-center justify-center rounded-lg mx-auto cursor-pointer hover:bg-gray-200 transition duration-150">
+              {selectedContentImage ? (
+                <img
+                  src={selectedContentImage}
+                  alt="Content Preview"
+                  className="object-cover w-full h-full rounded-lg"
+                />
+              ) : (
+                <span className="text-gray-500">Click to Upload</span>
+              )}
+            </div>
+          </label>
+        )}
+
+        {/* Toggle to use sample style image */}
+        <div className="mb-4">
+          <label className="block mb-2 text-center text-amber-300">
+            <input
+              type="checkbox"
+              checked={useSampleStyle}
+              onChange={() => setUseSampleStyle(!useSampleStyle)}
+            />
+            Use sample style image
+          </label>
+        </div>
+
+        {/* Style Image Input */}
+        {useSampleStyle ? (
+          <div className="flex justify-center gap-4 mb-4">
+            {sampleStyleImages.map((sample, index) => (
+              <img
+                key={index}
+                src={sample}
+                alt={`Sample Style ${index + 1}`}
+                className={`w-24 h-24 cursor-pointer rounded-lg ${selectedStyleImage === sample ? "border-4 border-blue-500" : "border-2"}`}
+                onClick={() => selectSampleStyleImage(sample)}
+              />
+            ))}
+          </div>
+        ) : (
+          <label className="block cursor-pointer mb-4">
+            <span className="text-gray-800 sm:text-lg font-semibold mb-2 block text-center">
+              Select Style Image:
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleStyleImageChange}
+              className="hidden"
+            />
+            <div className="w-48 h-48 bg-gray-100 border-4 border-dashed border-gray-300 flex items-center justify-center rounded-lg mx-auto cursor-pointer hover:bg-gray-200 transition duration-150">
+              {selectedStyleImage ? (
+                <img
+                  src={selectedStyleImage}
+                  alt="Style Preview"
+                  className="object-cover w-full h-full rounded-lg"
+                />
+              ) : (
+                <span className="text-gray-500">Click to Upload</span>
+              )}
+            </div>
+          </label>
+        )}
+
+        {/* Iterations Input */}
+        <div className="mb-4">
+         
+        </div>
+
+        {/* Upload Button */}
+        <button
+          onClick={uploadImages}
+          disabled={isUploading}
+          className={`w-full  bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 transition duration-200 ${isUploading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          {isUploading ? `Uploading..` : "Upload"}
+        
+        </button>
+        <p className="text-slate-600 text-center">
+          {isUploading ? `Time Remaining... ${timer}s` : ""}
+          </p>  
+
+        {/* Output Image Display */}
+        {outputImages && (
+          <div className="mt-20">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">Processed Image:</h2>
+            <img
+              src={outputImages}
+              alt="Processed Output"
+              className="object-cover w-80 h-80 rounded-lg mx-auto mb-4"
+            />
+            <button
+              onClick={downloadImage}
+              className="w-full bg-green-500 text-white font-semibold py-2 rounded-lg hover:bg-green-600 transition duration-200"
+            >
+              Download Processed Image
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
+
+export default ImageUploader;
