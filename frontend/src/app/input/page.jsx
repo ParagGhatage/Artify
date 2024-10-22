@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const ImageUploader = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -26,11 +27,10 @@ const ImageUploader = () => {
     setIsUploading(true); // Show loading state while uploading
 
     const formData = new FormData();
-    formData.append('image', selectedFile); // Append the file to FormData
+    formData.append('content', selectedFile); // Append the file to FormData
 
     try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+      const response = await axios.post('http://127.0.0.1:5000/', {
         body: formData,
       });
 

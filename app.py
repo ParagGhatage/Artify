@@ -19,7 +19,7 @@ model = VGG19(include_top=False, weights='imagenet')
 
 # Content and Style Layers
 content_layers = ['block4_conv2', 'block5_conv3']
-style_layers = ['block1_conv1', 'block2_conv1','block2_conv2', 'block3_conv3', 'block4_conv3','block5_conv3']
+style_layers = ['block1_conv1','block2_conv2', 'block3_conv3', 'block4_conv3','block5_conv3']
 
 content_weight = 1e0
 style_weight = 1e6
