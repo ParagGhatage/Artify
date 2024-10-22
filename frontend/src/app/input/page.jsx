@@ -136,11 +136,13 @@ const ImageUploader = () => {
   const selectSampleContentImage = (sample) => {
     setSelectedContentImage(sample);
     setContentFile(null); // Clear any uploaded file
+    setUseSampleContent(false); // Hide sample images after selection
   };
 
   const selectSampleStyleImage = (sample) => {
     setSelectedStyleImage(sample);
     setStyleFile(null); // Clear any uploaded file
+    setUseSampleStyle(false); // Hide sample images after selection
   };
 
   return (
@@ -257,37 +259,32 @@ const ImageUploader = () => {
          
         </div>
 
-        {/* Timer Display */}
-        <div className="mb-4">
-          <span className="text-gray-800 text-xl">
-           
-            {isUploading ?` Time Remaining: ${timer} seconds` : ""}
-          </span>
-        </div>
-
         {/* Upload Button */}
         <button
           onClick={uploadImages}
           disabled={isUploading}
-          className={`w-full bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition duration-150 ${
-            isUploading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`w-full  bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 transition duration-200 ${isUploading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
         >
-          {isUploading ? "Uploading..." : "Upload Images"}
+          {isUploading ? `Uploading..` : "Upload"}
+        
         </button>
+        <p className="text-slate-600 text-center">
+          {isUploading ? `Time Remaining... ${timer}s` : ""}
+          </p>  
 
         {/* Output Image Display */}
         {outputImages && (
-          <div className="mt-8 text-center">
-            <h2 className="text-xl font-bold mb-4">Processed Image:</h2>
+          <div className="mt-20">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">Processed Image:</h2>
             <img
               src={outputImages}
-              alt="Processed Result"
-              className="rounded-lg w-1/2 mx-auto"
+              alt="Processed Output"
+              className="object-cover w-80 h-80 rounded-lg mx-auto mb-4"
             />
             <button
               onClick={downloadImage}
-              className="mt-4 bg-green-500 text-white rounded-lg px-4 py-2 hover:bg-green-600 transition duration-150"
+              className="w-full bg-green-500 text-white font-semibold py-2 rounded-lg hover:bg-green-600 transition duration-200"
             >
               Download Processed Image
             </button>
