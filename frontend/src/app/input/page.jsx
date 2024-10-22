@@ -158,13 +158,9 @@ const ImageUploader = () => {
           <label className="text-gray-800 sm:text-lg font-semibold mb-2 block text-center">
             Iterations (comma-separated):
           </label>
-          <input
-            type="text"
-            value={iterations}
-            onChange={handleIterationsChange}
-            className="border border-gray-300 text-slate-950 rounded-md p-2 w-full"
-            placeholder="e.g., 250,500,750"
-          />
+       
+            
+          
         </div>
 
         {/* Upload Button */}
