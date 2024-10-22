@@ -84,6 +84,15 @@ const ImageUploader = () => {
     }
   };
 
+  const downloadImage = () => {
+    if (outputImages) {
+      const link = document.createElement("a");
+      link.href = outputImages;
+      link.download = "processed_image.png";
+      link.click();
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-blue-500 p-6">
       <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-2xl">
@@ -179,16 +188,24 @@ const ImageUploader = () => {
         {/* Display Processed Images */}
         {outputImages && (
           <div className="mt-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Processed Images:</h2>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="w-48 h-48 border border-gray-300 rounded-lg overflow-hidden mx-auto">
-                <img
-                  src={outputImages}
-                  alt="Styled"
-                  id="image-container"
-                  className="object-cover w-full h-full"
-                />
-              </div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Processed Image:</h2>
+            <div className="w-48 h-48 border border-gray-300 rounded-lg overflow-hidden mx-auto">
+              <img
+                src={outputImages}
+                alt="Styled"
+                id="image-container"
+                className="object-cover w-full h-full"
+              />
+            </div>
+
+            {/* Download Button */}
+            <div className="mt-4 text-center">
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-green-600 transition duration-150 focus:ring-4 focus:ring-green-300 focus:outline-none"
+                onClick={downloadImage}
+              >
+                Download Image
+              </button>
             </div>
           </div>
         )}
