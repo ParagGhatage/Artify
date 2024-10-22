@@ -1,15 +1,17 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const ImageUploader = () => {
   const [selectedContentImage, setSelectedContentImage] = useState(null);
   const [selectedStyleImage, setSelectedStyleImage] = useState(null);
-  const [outputImages, setOutputImages] = useState(); // Updated to handle multiple output images
+  const [outputImages, setOutputImages] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [contentFile, setContentFile] = useState(null);
   const [styleFile, setStyleFile] = useState(null);
   const [iterations, setIterations] = useState(100); // Default iteration values
+  const [timer, setTimer] = useState(120); // Reverse timer starting from 120 seconds (2 minutes)
+  const [intervalId, setIntervalId] = useState(null); // Interval ID for clearing
 
   const handleContentImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -31,6 +33,31 @@ const ImageUploader = () => {
     setIterations(e.target.value);
   };
 
+  const startTimer = () => {
+    setTimer(120); // Reset timer to 120 seconds
+    const id = setInterval(() => {
+      setTimer((prevTimer) => {
+        if (prevTimer > 0) return prevTimer - 1;
+        return prevTimer;
+      });
+    }, 1000);
+    setIntervalId(id); // Store interval ID
+  };
+
+  const stopTimer = () => {
+    if (intervalId) {
+      clearInterval(intervalId); // Stop timer
+    }
+  };
+
+  useEffect(() => {
+    // Stop the timer when it reaches 0
+    if (timer === 0) {
+      stopTimer();
+      setIsUploading(false); // Optionally handle timeout case
+    }
+  }, [timer]);
+
   const uploadImages = async () => {
     if (!contentFile || !styleFile) {
       alert("Please select both content and style images.");
@@ -38,26 +65,20 @@ const ImageUploader = () => {
     }
 
     setIsUploading(true); // Show loading state while uploading
+    startTimer(); // Start timer when upload begins
 
     const formData = new FormData();
     formData.append("content", contentFile);
     formData.append("style", styleFile);
-    formData.append("iterations",iterations); // Convert iterations input to array of numbers
+    formData.append("iterations", iterations); // Convert iterations input to array of numbers
 
     try {
-      axios.post('http://127.0.0.1:5000/style', formData, { responseType: 'blob' })
-  .then(response => {
-    const imageUrls = URL.createObjectURL(new Blob([response.data], { type: 'image/png' }));
-    // document.getElementById('image-container').src = imageUrls;
-    console.log(imageUrls)
-
-    setOutputImages(imageUrls); // Set the processed images URLs
-  })
-  .catch(error => {
-    console.error('Error fetching image:', error);
-  });
-      
-    
+      const response = await axios.post("http://127.0.0.1:5000/style", formData, { responseType: "blob" });
+      const imageUrls = URL.createObjectURL(new Blob([response.data], { type: "image/png" }));
+      setOutputImages(imageUrls); // Set the processed image URLs
+      stopTimer(); // Stop the timer once the image is returned
+    } catch (error) {
+      console.error("Error fetching image:", error);
     } finally {
       setIsUploading(false); // Hide loading state
     }
@@ -147,10 +168,11 @@ const ImageUploader = () => {
           </button>
         </div>
 
-        {/* Display Loading Indicator */}
+        {/* Display Reverse Timer */}
         {isUploading && (
           <div className="mt-4 text-blue-500 text-center">
-            Uploading and processing image...
+            Uploading and processing image... <br />
+            Time remaining: {timer} seconds
           </div>
         )}
 
@@ -159,17 +181,14 @@ const ImageUploader = () => {
           <div className="mt-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Processed Images:</h2>
             <div className="grid grid-cols-3 gap-4">
-              <h1>this is</h1>
-              {outputImages?(
-                <div className="w-48 h-48 border border-gray-300 rounded-lg overflow-hidden mx-auto">
-                  <img
-                    src={outputImages}
-                    alt={`Styled`}
-                    id="image-container"
-                    className="object-cover w-full h-full"
-                  />
-                </div>):NaN
-              }
+              <div className="w-48 h-48 border border-gray-300 rounded-lg overflow-hidden mx-auto">
+                <img
+                  src={outputImages}
+                  alt="Styled"
+                  id="image-container"
+                  className="object-cover w-full h-full"
+                />
+              </div>
             </div>
           </div>
         )}
