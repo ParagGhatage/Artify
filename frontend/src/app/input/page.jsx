@@ -49,9 +49,13 @@ const ImageUploader = () => {
   };
 
   const startTimer = () => {
-    setTimer(120);
+    setTimer(120); // Reset the timer to 120 seconds
     const id = setInterval(() => {
-      setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : prevTimer));
+      setTimer((prevTimer) => {
+        if (prevTimer > 0) return prevTimer - 1;
+        stopTimer(); // Stop the timer when it reaches 0
+        return 0;
+      });
     }, 1000);
     setIntervalId(id);
   };
@@ -59,6 +63,7 @@ const ImageUploader = () => {
   const stopTimer = () => {
     if (intervalId) {
       clearInterval(intervalId);
+      setIntervalId(null); // Reset the interval ID after clearing it
     }
   };
 
@@ -70,6 +75,9 @@ const ImageUploader = () => {
   }, [timer]);
 
   const uploadImages = async () => {
+    // Clear any existing timer before starting a new upload
+    stopTimer();
+
     setIsUploading(true);
     startTimer();
 
@@ -108,10 +116,10 @@ const ImageUploader = () => {
       const response = await axios.post("http://127.0.0.1:5000/style", formData, { responseType: "blob" });
       const imageUrls = URL.createObjectURL(new Blob([response.data], { type: "image/png" }));
       setOutputImages(imageUrls);
-      stopTimer();
     } catch (error) {
       console.error("Error fetching image:", error);
     } finally {
+      stopTimer(); // Ensure the timer is stopped once the upload completes
       setIsUploading(false);
     }
   };
@@ -142,7 +150,6 @@ const ImageUploader = () => {
           <h1 className="text-3xl font-bold text-gray-800 mb-4">
             Upload or Select Your Images
           </h1>
-
         </div>
 
         {/* Toggle to use sample content image */}
@@ -250,30 +257,39 @@ const ImageUploader = () => {
          
         </div>
 
-        {/* Upload Button */}
-        <div className="flex justify-center">
-          <button
-            onClick={uploadImages}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-150"
-            disabled={isUploading}
-          >
-            {isUploading ? "Uploading..." : "Upload Images"}
-          </button>
+        {/* Timer Display */}
+        <div className="mb-4">
+          <span className="text-gray-800 text-xl">
+           
+            {isUploading ?` Time Remaining: ${timer} seconds` : ""}
+          </span>
         </div>
-        <p className="text-lg text-gray-600 text-center">
-            {isUploading && `Processing... Time remaining: ${timer} seconds`}
-          </p>
 
-        {/* Output Image */}
+        {/* Upload Button */}
+        <button
+          onClick={uploadImages}
+          disabled={isUploading}
+          className={`w-full bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition duration-150 ${
+            isUploading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          {isUploading ? "Uploading..." : "Upload Images"}
+        </button>
+
+        {/* Output Image Display */}
         {outputImages && (
-          <div className="mt-8">
-            <h2 className="text-lg font-semibold">Processed Image:</h2>
-            <img src={outputImages} alt="Processed Output" className="mt-4 max-w-full" />
+          <div className="mt-8 text-center">
+            <h2 className="text-xl font-bold mb-4">Processed Image:</h2>
+            <img
+              src={outputImages}
+              alt="Processed Result"
+              className="rounded-lg w-1/2 mx-auto"
+            />
             <button
-              className="mt-4 bg-green-600 text-white px-4 py-2 rounded-md"
               onClick={downloadImage}
+              className="mt-4 bg-green-500 text-white rounded-lg px-4 py-2 hover:bg-green-600 transition duration-150"
             >
-              Download Image
+              Download Processed Image
             </button>
           </div>
         )}
