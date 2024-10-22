@@ -5,11 +5,11 @@ import axios from "axios";
 const ImageUploader = () => {
   const [selectedContentImage, setSelectedContentImage] = useState(null);
   const [selectedStyleImage, setSelectedStyleImage] = useState(null);
-  const [outputImages, setOutputImages] = useState([]); // Updated to handle multiple output images
+  const [outputImages, setOutputImages] = useState(); // Updated to handle multiple output images
   const [isUploading, setIsUploading] = useState(false);
   const [contentFile, setContentFile] = useState(null);
   const [styleFile, setStyleFile] = useState(null);
-  const [iterations, setIterations] = useState("5"); // Default iteration values
+  const [iterations, setIterations] = useState(100); // Default iteration values
 
   const handleContentImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -42,19 +42,22 @@ const ImageUploader = () => {
     const formData = new FormData();
     formData.append("content", contentFile);
     formData.append("style", styleFile);
-    formData.append("iterations", JSON.stringify(iterations.split(',').map(Number))); // Convert iterations input to array of numbers
+    formData.append("iterations",iterations); // Convert iterations input to array of numbers
 
     try {
-      const response = await axios.post("http://127.0.0.1:5000/style", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        responseType: "blob", // Expect binary data for images
-      });
+      axios.post('http://127.0.0.1:5000/style', formData, { responseType: 'blob' })
+  .then(response => {
+    const imageUrls = URL.createObjectURL(new Blob([response.data], { type: 'image/png' }));
+    // document.getElementById('image-container').src = imageUrls;
+    console.log(imageUrls)
 
-      // Assuming the response contains multiple images as blobs
-      const imageUrls = response.data.map((blob) => URL.createObjectURL(new Blob([blob], { type: "image/png" })));
-      setOutputImages(imageUrls); // Set the processed images URLs
-    } catch (error) {
-      console.error("Error uploading images:", error);
+    setOutputImages(imageUrls); // Set the processed images URLs
+  })
+  .catch(error => {
+    console.error('Error fetching image:', error);
+  });
+      
+    
     } finally {
       setIsUploading(false); // Hide loading state
     }
@@ -152,20 +155,21 @@ const ImageUploader = () => {
         )}
 
         {/* Display Processed Images */}
-        {outputImages.length > 0 && (
+        {outputImages && (
           <div className="mt-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Processed Images:</h2>
             <div className="grid grid-cols-3 gap-4">
               <h1>this is</h1>
-              {outputImages.map((imageSrc, index) => (
-                <div key={index} className="w-48 h-48 border border-gray-300 rounded-lg overflow-hidden mx-auto">
+              {outputImages?(
+                <div className="w-48 h-48 border border-gray-300 rounded-lg overflow-hidden mx-auto">
                   <img
-                    src={imageSrc}
-                    alt={`Processed Preview ${index + 1}`}
+                    src={outputImages}
+                    alt={`Styled`}
+                    id="image-container"
                     className="object-cover w-full h-full"
                   />
-                </div>
-              ))}
+                </div>):NaN
+              }
             </div>
           </div>
         )}

@@ -4,8 +4,12 @@ import tensorflow as tf
 from tensorflow.keras.applications import VGG19
 from flask import Flask, request, send_file
 from PIL import Image
+import os
+from flask_cors import CORS
 
 app = Flask(__name__)
+
+CORS(app)
 
 # Load and preprocess images from uploaded files
 def load_and_preprocess_image(file):
@@ -103,6 +107,7 @@ def style_transfer(content_image, style_image, target_iteration):
 # Flask API route to handle style transfer
 @app.route('/style', methods=['POST'])
 def run_style_transfer():
+    print("request received")
     # Get the uploaded files (content and style images)
     content_file = request.files['content']
     style_file = request.files['style']
@@ -129,4 +134,5 @@ def run_style_transfer():
     return send_file(results[0], mimetype='image/png')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
