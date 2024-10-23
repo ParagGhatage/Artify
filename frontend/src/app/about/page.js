@@ -4,12 +4,12 @@ import Link from 'next/link';
 const AboutUs = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-500 to-blue-500 p-8">
-      <div className="absolute top-4 right-4 flex space-x-4">
+      <div className="absolute top-4 right-4 flex space-x-4 text-xl">
   <div className="bg-gradient-to-r from-green-500 to-green-400 text-white py-2 px-6 rounded-full shadow-lg hover:from-blue-500 hover:to-blue-400 transition-all duration-300 ease-in-out transform hover:scale-105">
     <Link href={'/'}>Home</Link>
   </div>
   <div className="bg-gradient-to-r from-green-500 to-green-400 text-white py-2 px-6 rounded-full shadow-lg hover:from-blue-500 hover:to-blue-400 transition-all duration-300 ease-in-out transform hover:scale-105">
-    <Link href={'/contact'}>Contact</Link>
+    <Link href={'/contact'}>Contact us</Link>
   </div>
 </div>
       <div className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-4xl text-center mt-20 transform hover:scale-105 transition duration-500 ease-in-out">

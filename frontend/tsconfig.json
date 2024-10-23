@@ -15,7 +15,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "preserve", // Updated to react-jsx for React 17+
     "plugins": [
       {
         "name": "next"
@@ -26,7 +26,8 @@
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "**/*.jsx" // Include .jsx files
   ],
   "exclude": [
     "node_modules"

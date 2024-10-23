@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
-
-
+import Loader from "../components/Loader";
 
 const ImageUploader = () => {
   const [selectedContentImage, setSelectedContentImage] = useState(null);
@@ -15,25 +14,48 @@ const ImageUploader = () => {
   const [iterations, setIterations] = useState(100);
   const [timer, setTimer] = useState(120);
   const [intervalId, setIntervalId] = useState(null);
+  const [requestSent, setRequestSent] = useState(false); // State to track request
 
   // Sample images for content and style
   const sampleContentImages = [
-    "/samples/content1.jpg",
-    "/samples/content2.jpg",
+    "/samples/city.jpg",
+    "/samples/nature1.jpg",
     "/samples/content3.jpg",
-    "/samples/content4.jpg",
+    "/samples/tiger.jpg",
     "/samples/content5.jpg",
+    "/samples/new3.jpg",
+
   ];
   const sampleStyleImages = [
-    "/samples/style1.jpg",
-    "/samples/style2.jpg",
+    "/samples/new2.jpg",
     "/samples/style3.jpg",
+    "/samples/style11.jpg",
+    "/samples/style19.png",
     "/samples/style4.png",
     "/samples/style5.png",
   ];
 
   const [useSampleContent, setUseSampleContent] = useState(false);
   const [useSampleStyle, setUseSampleStyle] = useState(false);
+
+  useEffect(() => {
+    const sendInitialRequest = async () => {
+      if (!requestSent) { // Check if the request has already been sent
+        try {
+          // Sending an initial POST request to /style
+          await axios.post("https://artify-563601529608.us-central1.run.app/style", {
+            // Add any required data here
+          });
+          console.log("Initial request sent successfully");
+          setRequestSent(true); // Update state to indicate request was sent
+        } catch (error) {
+          console.error("Error sending initial request:", error);
+        }
+      }
+    };
+
+    sendInitialRequest();
+  }, [requestSent]);
 
   const handleContentImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -158,7 +180,15 @@ const ImageUploader = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-blue-500 p-6">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-blue-500 p-6">
+    <div className=" top-4 flex space-x-4 mb-2 text-xl ">
+  <div className="bg-gradient-to-r from-green-500 to-green-400 text-white py-2 px-6 rounded-full shadow-lg hover:from-blue-500 hover:to-blue-400 transition-all duration-300 ease-in-out transform hover:scale-105">
+    <Link href={'/about'}>About</Link>
+  </div>
+  <div className="bg-gradient-to-r from-green-500 to-green-400 text-white py-2 px-6 rounded-full shadow-lg hover:from-blue-500 hover:to-blue-400 transition-all duration-300 ease-in-out transform hover:scale-105">
+    <Link href={'/contact'}>Contact us</Link>
+  </div>
+</div>
     <img 
     src="/logo.png" 
     alt="Logo" 
@@ -167,14 +197,7 @@ const ImageUploader = () => {
 
 
     
-<div className="absolute top-4 right-4 flex space-x-4">
-  <div className="bg-gradient-to-r from-green-500 to-green-400 text-white py-2 px-6 rounded-full shadow-lg hover:from-blue-500 hover:to-blue-400 transition-all duration-300 ease-in-out transform hover:scale-105">
-    <Link href={'/about'}>About</Link>
-  </div>
-  <div className="bg-gradient-to-r from-green-500 to-green-400 text-white py-2 px-6 rounded-full shadow-lg hover:from-blue-500 hover:to-blue-400 transition-all duration-300 ease-in-out transform hover:scale-105">
-    <Link href={'/contact'}>Contact</Link>
-  </div>
-</div>
+
 
       <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-2xl">
       <div className="text-center mb-8">
@@ -204,7 +227,7 @@ const ImageUploader = () => {
 
         {/* Content Image Input */}
         {useSampleContent ? (
-          <div className="flex justify-center gap-4 mb-4">
+          <div className="sm:flex justify-center gap-4 grid-cols-3 grid mb-4">
             {sampleContentImages.map((sample, index) => (
               <img
                 key={index}
@@ -254,7 +277,7 @@ const ImageUploader = () => {
 
         {/* Style Image Input */}
         {useSampleStyle ? (
-          <div className="flex justify-center gap-4 mb-4">
+          <div className="sm:flex justify-center grid grid-cols-3 gap-4 mb-4">
             {sampleStyleImages.map((sample, index) => (
               <img
                 key={index}
@@ -302,15 +325,21 @@ const ImageUploader = () => {
           className={`w-full  bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 transition duration-200 ${isUploading ? "opacity-50 cursor-not-allowed" : ""
             }`}
         >
-          {isUploading ? `Uploading..` : "Upload"}
+          {isUploading ? `Generating an image...` : "Upload"}
         
         </button>
+
         <p className={`text-center ${isUploading ? 'animate-pulse' : ''}`}>
   {isUploading ? (
-    <span className="text-xl font-semibold text-slate-700">
-      Time Remaining... 
-      <span className="text-indigo-600"> {timer}s</span>
-    </span>
+    <div className="flex flex-col items-center justify-center"> {/* Flexbox centering */}
+      <span className="text-xl font-semibold text-black">
+        Time Remaining... 
+        <span className="text-indigo-600"> {timer}s</span>
+      </span>
+      <div className="text-black mt-5">
+        <Loader color="#000" /> {/* Set the color prop to black */}
+      </div>
+    </div>
   ) : ""}
 </p>
 
@@ -318,7 +347,7 @@ const ImageUploader = () => {
         {/* Output Image Display */}
         {outputImages && (
           <div className="mt-20">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">Processed Image:</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-2 text-center">Processed Image</h2>
             <img
               src={outputImages}
               alt="Processed Output"
