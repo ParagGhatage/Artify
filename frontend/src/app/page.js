@@ -118,7 +118,7 @@ const ImageUploader = () => {
     formData.append("iterations", iterations);
 
     try {
-      const response = await axios.post("http://127.0.0.1:5000/style", formData, { responseType: "blob" });
+      const response = await axios.post("https://artify-563601529608.us-central1.run.app/style", formData, { responseType: "blob" });
       const imageUrls = URL.createObjectURL(new Blob([response.data], { type: "image/png" }));
       setOutputImages(imageUrls);
     } catch (error) {
@@ -152,28 +152,36 @@ const ImageUploader = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-blue-500 p-6">
-    <div className="text-5xl font-bold italic text-white drop-shadow-lg mb-6 text-center">
-  Artify
-</div>
+    <img 
+    src="/logo.png" 
+    alt="Logo" 
+    className="max-w-80"
+    />
+
 
     
-     <div className=" absolute top-4 right-4 flex space-x-4 ">
+<div className="absolute top-4 right-4 flex space-x-4">
+  <div className="bg-gradient-to-r from-green-500 to-green-400 text-white py-2 px-6 rounded-full shadow-lg hover:from-blue-500 hover:to-blue-400 transition-all duration-300 ease-in-out transform hover:scale-105">
+    <Link href={'/about'}>About</Link>
+  </div>
+  <div className="bg-gradient-to-r from-green-500 to-green-400 text-white py-2 px-6 rounded-full shadow-lg hover:from-blue-500 hover:to-blue-400 transition-all duration-300 ease-in-out transform hover:scale-105">
+    <Link href={'/contact'}>Contact</Link>
+  </div>
+</div>
 
-       <div 
-          className="bg-green-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
-          <Link href={'/about'}>About</Link>
-        </div>
-       <div 
-          className="bg-green-500 text-white py-2 px-4 ml-3 rounded hover:bg-blue-600 transition duration-200">
-          <Link href={'/contact'}>Contact</Link>
-        </div>
-            </div>
       <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-2xl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">
-            Upload or Select Your Images
-          </h1>
-        </div>
+      <div className="text-center mb-8">
+  <h1 className="text-3xl font-bold text-gray-800 mb-4">
+    Upload or Select Your Images
+  </h1>
+  <p className="text-lg text-gray-600 mb-2">
+    Transform your images with stunning artistic styles!
+  </p>
+  <p className="text-lg text-gray-600">
+    Just upload and let your creativity shine!
+  </p>
+</div>
+
 
         {/* Toggle to use sample content image */}
         <div className="mb-4">
@@ -290,9 +298,15 @@ const ImageUploader = () => {
           {isUploading ? `Uploading..` : "Upload"}
         
         </button>
-        <p className="text-slate-600 text-center">
-          {isUploading ? `Time Remaining... ${timer}s` : ""}
-          </p>  
+        <p className={`text-center ${isUploading ? 'animate-pulse' : ''}`}>
+  {isUploading ? (
+    <span className="text-xl font-semibold text-slate-700">
+      Time Remaining... 
+      <span className="text-indigo-600"> {timer}s</span>
+    </span>
+  ) : ""}
+</p>
+
 
         {/* Output Image Display */}
         {outputImages && (
