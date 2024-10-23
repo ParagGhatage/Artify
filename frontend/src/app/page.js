@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Link from "next/link";
 
 const ImageUploader = () => {
   const [selectedContentImage, setSelectedContentImage] = useState(null);
@@ -18,11 +19,15 @@ const ImageUploader = () => {
     "/samples/content1.jpg",
     "/samples/content2.jpg",
     "/samples/content3.jpg",
+    "/samples/content4.jpg",
+    "/samples/content5.jpg",
   ];
   const sampleStyleImages = [
     "/samples/style1.jpg",
     "/samples/style2.jpg",
     "/samples/style3.jpg",
+    "/samples/style4.png",
+    "/samples/style5.png",
   ];
 
   const [useSampleContent, setUseSampleContent] = useState(false);
@@ -147,6 +152,22 @@ const ImageUploader = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-blue-500 p-6">
+    <div className="text-5xl font-bold italic text-white drop-shadow-lg mb-6 text-center">
+  Artify
+</div>
+
+    
+     <div className=" absolute top-4 right-4 flex space-x-4 ">
+
+       <div 
+          className="bg-green-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
+          <Link href={'/about'}>About</Link>
+        </div>
+       <div 
+          className="bg-green-500 text-white py-2 px-4 ml-3 rounded hover:bg-blue-600 transition duration-200">
+          <Link href={'/contact'}>Contact</Link>
+        </div>
+            </div>
       <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-2xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-4">
