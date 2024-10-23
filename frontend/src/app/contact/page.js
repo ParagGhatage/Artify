@@ -42,7 +42,7 @@ const ContactUs = () => {
           </div>
 
           <div className="bg-gradient-to-br from-yellow-100 to-white p-6 rounded-xl shadow-lg text-left">
-            <h3 className="text-xl font-bold text-gray-800 mb-2">Parag</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Pratham</h3>
             <p className="text-gray-600 mb-2"><Link href={"mailto:angdalwarpratham@gmail.com"}>
             Email:<div className='text-blue-600'> angdalwarpratham@gmail.com</div>
             </Link></p>
