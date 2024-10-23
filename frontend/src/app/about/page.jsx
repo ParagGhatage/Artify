@@ -20,7 +20,7 @@ const AboutUs = () => {
           Welcome to <span className="font-semibold text-indigo-500">Artify</span>, where we believe in transforming your ordinary images into extraordinary art! Our mission is to empower individuals and creators by providing innovative tools and processes that enhance their visual expressions.
         </p>
         <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-          At Artify, we leverage advanced technology and creative algorithms to apply unique artistic styles to your images. Whether you're looking to create stunning pieces for your portfolio or simply want to add a touch of flair to your personal photos, we've got you covered.
+          At Artify, we leverage advanced technology and creative algorithms to apply unique artistic styles to your images. Whether you&apos;re looking to create stunning pieces for your portfolio or simply want to add a touch of flair to your personal photos, we&apos;ve got you covered.
         </p>
         <p className="text-lg text-gray-700 mb-6 leading-relaxed">
           Our team is passionate about art and technology, constantly working to improve our platform and provide you with the best experience possible. We are committed to helping you explore your creativity and unlock the full potential of your images.
@@ -29,7 +29,7 @@ const AboutUs = () => {
           Join Us on Our Journey
         </h2>
         <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-          Thank you for being a part of the <span className="font-semibold text-indigo-500">Artify</span> community! We are excited to see the amazing artwork you create with our tools. Let's make art together!
+          Thank you for being a part of the <span className="font-semibold text-indigo-500">Artify</span> community! We are excited to see the amazing artwork you create with our tools. Let&apos;s make art together!
         </p>
       </div>
     </div>
