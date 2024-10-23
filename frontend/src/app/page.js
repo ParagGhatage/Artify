@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
-import { useToast } from "@chakra-ui/react";
+
 
 
 const ImageUploader = () => {
@@ -15,7 +15,6 @@ const ImageUploader = () => {
   const [iterations, setIterations] = useState(100);
   const [timer, setTimer] = useState(120);
   const [intervalId, setIntervalId] = useState(null);
-  const toast = useToast()
 
   // Sample images for content and style
   const sampleContentImages = [
@@ -126,12 +125,7 @@ const ImageUploader = () => {
       setOutputImages(imageUrls);
 
     } catch (error) {
-      toast({
-        title: `Some error occured while generating image.`,
-        description:"Please try again!",
-        status: "error",
-        isClosable: true,
-      })
+     
       console.error("Error fetching image:", error);
     } finally {
       stopTimer(); // Ensure the timer is stopped once the upload completes
@@ -139,12 +133,7 @@ const ImageUploader = () => {
     }
   };
   if((outputImages)){
-    toast({
-      title: `Image generated successfully!`,
-      description:"your image is ready to download.",
-      status: "success",
-      isClosable: true,
-    })
+    
   }
 
   const downloadImage = () => {
